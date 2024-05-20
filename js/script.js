@@ -13,11 +13,23 @@ const remainingGuessesSpan = document.querySelector(".remaining span");
 //The empty paragraph where messages will appear when the player guesses a letter
 const message = document.querySelector(".message");
 // The hidden button that will appear prompting the player to play again
-const playAgainButton = document.querySelector(".play-again hide");
+const playAgainButton = document.querySelector(".play-again");
 
 // Starter word
-const word = "magnolia";
+let word = "magnolia";
 const guessedLetters = [];
+let remainingGuesses = 8;
+
+const getWord = async function () {
+const response = await fetch ('https://gist.githubusercontent.com/skillcrush-curriculum/7061f1d4d3d5bfe47efbfbcfe42bf57e/raw/5ffc447694486e7dea686f34a6c085ae371b43fe/words.txt');
+const words = await response.text();
+const wordArray = words.split("\n");
+const randomIndex = Math.floor(Math.random() * wordArray.length);
+word = wordArray[randomIndex].trim();
+placeholder(word);
+};
+
+getWord();
 
 const placeholder = function (word) {
     const placeholderLetters = [];
@@ -27,8 +39,6 @@ const placeholder = function (word) {
     }
     wordProgress.innerText = placeholderLetters.join("");
 };
-
-placeholder(word);
 
 guessLetterButton.addEventListener('click', function (e) {
     e.preventDefault();
@@ -64,7 +74,7 @@ const makeGuess = function (guess) {
         message.innerText = "You already guessed that one, try again!"
     } else {
         guessedLetters.push(guess);
-        console.log(guessedLetters);
+        remainingGuessesCountdown(guess);
         showGuessedLetters();
         updateWordInProgress(guessedLetters);
     }
@@ -92,6 +102,24 @@ const updateWordInProgress = function (guessedLetters) {
     }
     wordProgress.innerText = revealWord.join("");
    checkIfWon();
+};
+
+const remainingGuessesCountdown = function (guess) {
+    const upperWord = word.toUpperCase();
+    if (!upperWord.includes (guess)) {
+        message.innerText = `Sorry, the word has no ${guess}.`;
+        remainingGuesses -= 1;
+    } else {
+        message.innerText = `Good guess! The word has the letter ${guess}!`;
+    }
+
+    if (remainingGuesses === 0) {
+        message.innerHTML = `Game over! The word was <span class ="highlight">${word}</span>.`; 
+    } else if (remainingGuesses === 1) {
+        remainingGuessesSpan.innerText = `${remainingGuesses} guess`;
+    } else {
+        remainingGuessesSpan.innerText = `${remainingGuesses} guesses`;
+    }
 };
 
 const checkIfWon = function () {

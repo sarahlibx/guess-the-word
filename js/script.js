@@ -14,6 +14,7 @@ const remainingGuessesSpan = document.querySelector(".remaining span");
 const message = document.querySelector(".message");
 // The hidden button that will appear prompting the player to play again
 const playAgainButton = document.querySelector(".play-again hide");
+
 // Starter word
 const word = "magnolia";
 const guessedLetters = [];
@@ -64,5 +65,38 @@ const makeGuess = function (guess) {
     } else {
         guessedLetters.push(guess);
         console.log(guessedLetters);
+        showGuessedLetters();
+        updateWordInProgress(guessedLetters);
+    }
+};
+
+const showGuessedLetters = function () {
+    guessedLettersElement.innerHTML = "";
+    for (const letter of guessedLetters) {
+      const li = document.createElement("li");
+      li.innerText = letter;
+      guessedLettersElement.append(li);
+    }
+  };
+
+const updateWordInProgress = function (guessedLetters) {
+    const wordUpper = word.toUpperCase();
+    const wordArray = wordUpper.split("");
+    const revealWord = [];
+    for (const letter of wordArray) {
+        if (guessedLetters.includes(letter)) {
+            revealWord.push(letter.toUpperCase());
+        } else {
+            revealWord.push("●");
+        }
+    }
+    wordProgress.innerText = revealWord.join("");
+   checkIfWon();
+};
+
+const checkIfWon = function () {
+    if (word.toUpperCase () === wordProgress.innerText) {
+        message.classList.add("win");
+        message.innerHTML = `<p class="highlight">You guessed correct the word! Congrats!</p>`;
     }
 };
